@@ -15,6 +15,7 @@ export default function Home() {
   ];
 
   const [isFlipped, setIsFlipped] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -62,41 +63,124 @@ export default function Home() {
             </motion.div>
             <span className="font-bold text-xl tracking-tight">FlashNest</span>
           </motion.div>
-          <div className="hidden md:flex space-x-10 font-medium">
-            {["Features", "Why FlashNest", "Pricing"].map((item, i) => (
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center">
+            <div className="flex space-x-10 font-medium mr-8">
+              {["Features", "Why FlashNest", "Pricing"].map((item, i) => (
+                <motion.a
+                  key={i}
+                  href={i === 0 ? "#features" : i === 1 ? "#why" : "#"}
+                  className="hover:text-yellow-600 transition-colors text-gray-700"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 + i * 0.1, duration: 0.6 }}
+                  whileHover={{ y: -1 }}>
+                  {item}
+                </motion.a>
+              ))}
+            </div>
+            <div className="flex">
               <motion.a
-                key={i}
-                href={i === 0 ? "#features" : i === 1 ? "#why" : "#"}
-                className="hover:text-yellow-600 transition-colors text-gray-700"
+                href="/login"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-5 rounded-lg transition-colors mr-3 inline-block"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 + i * 0.1, duration: 0.6 }}
-                whileHover={{ y: -1 }}>
-                {item}
+                transition={{ delay: 0.6, duration: 0.6 }}>
+                Sign In
               </motion.a>
-            ))}
+              <motion.a
+                href="/signup"
+                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-5 rounded-lg transition-colors shadow-sm inline-block"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.6 }}>
+                Sign Up
+              </motion.a>
+            </div>
           </div>
-          <div>
-            <motion.button
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-5 rounded-lg transition-colors mr-3"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.6 }}>
-              Sign In
-            </motion.button>
-            <motion.button
-              className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-5 rounded-lg transition-colors shadow-sm"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.6 }}>
-              Sign Up
-            </motion.button>
-          </div>
+
+          {/* Mobile Menu Button */}
+          <motion.button
+            className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu">
+            {!mobileMenuOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            )}
+          </motion.button>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-md"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}>
+              <div className="px-6 py-4 space-y-3">
+                {["Features", "Why FlashNest", "Pricing"].map((item, i) => (
+                  <a
+                    key={i}
+                    href={i === 0 ? "#features" : i === 1 ? "#why" : "#"}
+                    className="block py-2 text-gray-700 hover:text-yellow-600 font-medium"
+                    onClick={() => setMobileMenuOpen(false)}>
+                    {item}
+                  </a>
+                ))}
+                <div className="pt-3 mt-3 border-t border-gray-100 flex flex-col space-y-3">
+                  <a
+                    href="/login"
+                    className="block py-2 text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg"
+                    onClick={() => setMobileMenuOpen(false)}>
+                    Sign In
+                  </a>
+                  <a
+                    href="/signup"
+                    className="block py-2 text-center bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium rounded-lg"
+                    onClick={() => setMobileMenuOpen(false)}>
+                    Sign Up
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
       {/* Hero Section - Consistent Brand Yellow */}
