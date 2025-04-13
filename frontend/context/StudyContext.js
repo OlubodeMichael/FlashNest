@@ -10,8 +10,44 @@ function StudyProvider({ children }) {
   const [flashcards, setFlashcards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [aiResponse, setAiResponse] = useState(null);
 
   const apiUrl = "http://localhost:8000/api";
+
+  const testAi = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "deepseek/deepseek-chat-v3-0324:free",
+          messages: [
+            {
+              role: "user",
+              content: "What is the meaning of life?",
+            },
+          ],
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to test AI");
+      }
+
+      const data = await res.json();
+      setAiResponse(data.choices[0].message.content);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchDecks = async () => {
     try {
@@ -55,12 +91,13 @@ function StudyProvider({ children }) {
       }
 
       const data = await res.json();
-      setDeck(data);
+      setDeck(data.data.deck);
+      return data;
     } catch (err) {
       setError(err.message);
+      return null;
     } finally {
       setIsLoading(false);
-      setError(null);
     }
   };
 
@@ -251,6 +288,7 @@ function StudyProvider({ children }) {
         flashcards,
         isLoading,
         error,
+        aiResponse,
         fetchDecks,
         fetchDeck,
         createDeck,
@@ -260,6 +298,7 @@ function StudyProvider({ children }) {
         createFlashcard,
         updateFlashcard,
         deleteFlashcard,
+        testAi,
       }}>
       {children}
     </StudyContext.Provider>

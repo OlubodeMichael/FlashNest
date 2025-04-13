@@ -9,8 +9,7 @@ import LoadingSpinner from "@/app/_components/LoadingSpinner";
 
 export default function DashboardLayout({ children }) {
   const { user, logout, isLoading, fetchUser } = useAuth();
-  const { fetchDecks, decks } = useStudy();
-  console.log(user);
+  const { fetchDecks } = useStudy();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,7 +22,6 @@ export default function DashboardLayout({ children }) {
     fetchUserOnLoad();
   }, []);
 
-  console.log(decks);
   // Get user initials for profile display
   const getUserInitials = () => {
     if (user && user.firstName && user.lastName) {
@@ -76,7 +74,7 @@ export default function DashboardLayout({ children }) {
       ),
     },
     {
-      name: "Decks",
+      name: "My Decks",
       path: "/dashboard/decks",
       icon: (
         <svg
@@ -94,28 +92,10 @@ export default function DashboardLayout({ children }) {
         </svg>
       ),
     },
+
     {
-      name: "Flashcards",
-      path: "/dashboard/flashcards",
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      name: "Quiz Mode",
-      path: "/dashboard/quiz",
+      name: "Study Mode",
+      path: "/dashboard/study",
       icon: (
         <svg
           className="w-5 h-5"
@@ -160,7 +140,7 @@ export default function DashboardLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen overflow-hidden bg-gray-50">
       {/* Mobile menu button - positioned on the right */}
       <div className="lg:hidden fixed top-4 right-4 z-50">
         <button
@@ -330,8 +310,8 @@ export default function DashboardLayout({ children }) {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
-        <main className="min-h-screen p-4 md:p-8">{children}</main>
+      <div className="lg:pl-64 h-screen">
+        <main className="h-full overflow-auto p-4 md:p-8">{children}</main>
       </div>
 
       {/* Mobile menu backdrop */}

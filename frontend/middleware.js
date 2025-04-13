@@ -49,7 +49,9 @@ export async function middleware(req) {
     // Check if token is expired
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
       console.error("Token expired");
-      const response = NextResponse.redirect(new URL("/login", req.url));
+      const response = NextResponse.redirect(
+        new URL("/login?error=expired", req.url)
+      );
       response.cookies.delete("jwt");
       return response;
     }
@@ -67,7 +69,9 @@ export async function middleware(req) {
       errorType = "invalid";
     }
 
-    const response = NextResponse.redirect(new URL(`/login`, req.url));
+    const response = NextResponse.redirect(
+      new URL(`/login?error=${errorType}`, req.url)
+    );
     response.cookies.delete("jwt");
     return response;
   }

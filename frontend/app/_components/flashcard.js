@@ -31,7 +31,7 @@ export default function Flashcard({
 
   return (
     <div
-      className={`w-full h-72 relative perspective-[1000px] select-none ${className}`}
+      className={`w-[320px] h-72 relative perspective-[1000px] select-none ${className}`}
       onClick={handleFlip}>
       <div className="w-full h-full relative">
         {/* Front of Card (Question) */}
@@ -60,13 +60,15 @@ export default function Flashcard({
 
             {/* Card Content */}
             <div className="flex-grow flex flex-col justify-center items-center text-center">
-              <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
+              <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 leading-tight">
                 {front}
               </h3>
 
               {/* Hint (Optional) */}
               {hint && (
-                <p className="text-yellow-800/80 text-sm mb-8">{hint}</p>
+                <p className="text-yellow-800/80 text-sm md:text-base mb-8">
+                  {hint}
+                </p>
               )}
 
               {/* Interaction Indicator */}
@@ -77,7 +79,7 @@ export default function Flashcard({
                   fill="currentColor">
                   <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                 </svg>
-                <span className="text-xs font-medium">
+                <span className="text-xs md:text-sm font-medium">
                   Tap to reveal answer
                 </span>
               </div>
@@ -111,7 +113,9 @@ export default function Flashcard({
 
             {/* Card Content */}
             <div className="flex-grow flex flex-col justify-center items-center text-center">
-              <p className="text-gray-700 text-sm mb-4 max-w-xs">{back}</p>
+              <p className="text-gray-700 text-sm md:text-base lg:text-lg mb-4 max-w-xs">
+                {back}
+              </p>
 
               {/* Tags - Optional */}
               {tags && tags.length > 0 && (
@@ -119,7 +123,7 @@ export default function Flashcard({
                   {tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                      className="text-xs md:text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
                       {tag}
                     </span>
                   ))}
@@ -138,7 +142,7 @@ export default function Flashcard({
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-xs font-medium">
+                <span className="text-xs md:text-sm font-medium">
                   Tap to return to question
                 </span>
               </div>
