@@ -118,7 +118,7 @@ export default function Signup() {
               <div>
                 <label
                   htmlFor="firstName"
-                  className="block text-sm font-medium text-gray-700 mb-1">
+                  className="block text-sm font-medium text-gray-700 mb-1.5">
                   First Name
                 </label>
                 <input
@@ -126,9 +126,9 @@ export default function Signup() {
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className={`w-full px-4 py-3.5 border ${
+                  className={`w-full px-4 py-3 border ${
                     errors.firstName ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-yellow-400 focus:border-yellow-400`}
+                  } rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700`}
                   placeholder="John"
                   required
                 />
@@ -141,7 +141,7 @@ export default function Signup() {
               <div>
                 <label
                   htmlFor="lastName"
-                  className="block text-sm font-medium text-gray-700 mb-1">
+                  className="block text-sm font-medium text-gray-700 mb-1.5">
                   Last Name
                 </label>
                 <input
@@ -149,9 +149,9 @@ export default function Signup() {
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className={`w-full px-4 py-3.5 border ${
+                  className={`w-full px-4 py-3 border ${
                     errors.lastName ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-yellow-400 focus:border-yellow-400`}
+                  } rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700`}
                   placeholder="Doe"
                   required
                 />
@@ -164,7 +164,7 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1">
+                className="block text-sm font-medium text-gray-700 mb-1.5">
                 Email
               </label>
               <input
@@ -172,9 +172,9 @@ export default function Signup() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-4 py-3.5 border ${
+                className={`w-full px-4 py-3 border ${
                   errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-yellow-400 focus:border-yellow-400`}
+                } rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700`}
                 placeholder="your@email.com"
                 required
               />
@@ -186,7 +186,7 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1">
+                className="block text-sm font-medium text-gray-700 mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -195,9 +195,9 @@ export default function Signup() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full px-4 py-3.5 border ${
+                  className={`w-full px-4 py-3 border ${
                     errors.password ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-yellow-400 focus:border-yellow-400`}
+                  } text-gray-700 rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base`}
                   placeholder="••••••••"
                   required
                 />
@@ -245,7 +245,7 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1">
+                className="block text-sm font-medium text-gray-700 mb-1.5">
                 Confirm Password
               </label>
               <div className="relative">
@@ -254,11 +254,11 @@ export default function Signup() {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full px-4 py-3.5 border ${
+                  className={`w-full px-4 py-3 border ${
                     errors.confirmPassword
                       ? "border-red-500"
                       : "border-gray-300"
-                  } rounded-lg focus:ring-yellow-400 focus:border-yellow-400`}
+                  } text-gray-700 rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base`}
                   placeholder="••••••••"
                   required
                 />
@@ -306,11 +306,11 @@ export default function Signup() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3.5 px-4 rounded-lg transition-colors shadow-sm text-base flex items-center justify-center">
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3.5 px-4 rounded-lg transition-colors shadow-sm text-base">
                 {isLoading ? (
                   <>
                     <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-black inline"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24">

@@ -3,11 +3,33 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthProvider";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const { login, isLoading, error } = useAuth();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = formData;
+    await login(email, password);
+    router.push("/dashboard");
+  };
+
+  const handleChange = (e) => {
+    const { name, value, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === "rememberMe" ? checked : value,
+    });
+  };
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
@@ -31,9 +53,10 @@ export default function Login() {
             <p className="text-base text-gray-700">
               Enter your email and password to access your account.
             </p>
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -42,9 +65,10 @@ export default function Login() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700"
                 placeholder="your@email.com"
                 required
@@ -60,9 +84,10 @@ export default function Login() {
               <div className="relative">
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base"
                   placeholder="••••••••"
                   required
@@ -127,7 +152,7 @@ export default function Login() {
             <button
               type="submit"
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3.5 px-4 rounded-lg transition-colors shadow-sm text-base mt-4">
-              Log In
+              {isLoading ? "Logging in..." : "Log In"}
             </button>
           </form>
 

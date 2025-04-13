@@ -15,7 +15,8 @@ exports.getAllFlashcards = catchAsync(async (req, res, next) => {
 });
 
 exports.createFlashcard = catchAsync(async (req, res, next) => {
-  const { question, answer, deckId } = req.body;
+  const { question, answer } = req.body;
+  const { deckId } = req.params;
 
   const newFlashcard = await Flashcard.create({
     question,

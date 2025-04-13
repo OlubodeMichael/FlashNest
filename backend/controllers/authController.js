@@ -87,4 +87,29 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // verify token
+  const currentUser = await User.findById(decoded.id);
+
+  if (!currentUser) {
+    return next(
+      new AppError("User belonging to this token no longer exists.", 401)
+    );
+  }
+
+  if (currentUser.changePasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! Please login again.", 401)
+    );
+  }
+
+  req.user = currentUser;
+  next();
 });
+
+// Add logout function
+exports.logout = (req, res) => {
+  res.cookie("jwt", "", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: "success" });
+};

@@ -34,6 +34,12 @@ exports.getDeck = catchAsync(async (req, res, next) => {
   if (!deck) {
     return next(new AppError("No deck found with this ID", 404));
   }
+  res.status(201).json({
+    status: "success",
+    data: {
+      deck,
+    },
+  });
 });
 
 exports.updateDeck = catchAsync(async (req, res, next) => {

@@ -279,8 +279,9 @@ export default function Home() {
                 variants={staggerContainer}
                 initial="initial"
                 animate="animate">
-                <motion.button
+                <motion.a
                   className="bg-gray-900 text-white font-medium py-3 px-8 rounded-lg hover:bg-gray-800 transition-all shadow-md hover:shadow-lg"
+                  href="/signup"
                   whileHover={{
                     scale: 1.03,
                     boxShadow:
@@ -289,7 +290,7 @@ export default function Home() {
                   whileTap={{ scale: 0.98 }}
                   variants={fadeIn}>
                   Get Started Free
-                </motion.button>
+                </motion.a>
                 <motion.button
                   className="bg-white text-gray-700 border border-gray-200 font-medium py-3 px-8 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
                   whileHover={{ scale: 1.03 }}
@@ -968,56 +969,7 @@ export default function Home() {
                 <span className="font-bold text-lg">FlashNest</span>
               </div>
               <p className="text-gray-600 mb-4 text-sm">Gamify Your Learning</p>
-              <div className="flex space-x-3">
-                {["twitter", "facebook", "instagram"].map((social, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="text-gray-400 hover:text-gray-900">
-                    <div className="h-8 w-8 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
-                      <svg
-                        className="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor">
-                        <path d="M12 2C6.477 2 2 6.477 2 12c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10z" />
-                      </svg>
-                    </div>
-                  </a>
-                ))}
-              </div>
             </div>
-
-            {[
-              {
-                title: "Product",
-                links: ["Features", "Pricing", "Testimonials", "FAQ"],
-              },
-              {
-                title: "Company",
-                links: ["About", "Blog", "Careers", "Contact"],
-              },
-              {
-                title: "Legal",
-                links: ["Privacy Policy", "Terms of Service", "Cookie Policy"],
-              },
-            ].map((section, i) => (
-              <div key={i}>
-                <h4 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">
-                  {section.title}
-                </h4>
-                <ul className="space-y-2">
-                  {section.links.map((link, j) => (
-                    <li key={j}>
-                      <a
-                        href="#"
-                        className="text-gray-600 hover:text-yellow-600 transition-colors text-sm">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
 
           <div className="pt-6 border-t border-gray-200 flex flex-col md:flex-row md:justify-between items-center">
