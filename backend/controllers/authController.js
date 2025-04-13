@@ -108,8 +108,13 @@ exports.protect = catchAsync(async (req, res, next) => {
 // Add logout function
 exports.logout = (req, res) => {
   res.cookie("jwt", "", {
-    expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+    expires: new Date(0), // 👈 Expire the cookie immediately
   });
-  res.status(200).json({ status: "success" });
+
+  res
+    .status(200)
+    .json({ status: "success", message: "Logged out successfully" });
 };
