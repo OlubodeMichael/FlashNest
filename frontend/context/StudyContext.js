@@ -75,6 +75,7 @@ function StudyProvider({ children }) {
   };
 
   const fetchDeck = async (deckId) => {
+    setDeck(null);
     try {
       setIsLoading(true);
       setError(null);
@@ -181,6 +182,7 @@ function StudyProvider({ children }) {
   };
 
   const fetchFlashcards = async (deckId) => {
+    setFlashcards([]);
     try {
       setIsLoading(true);
       setError(null);

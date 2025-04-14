@@ -69,11 +69,13 @@ export default function Dashboard() {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-gray-800">Recent Decks</h3>
-          <Link href="/dashboard/decks">
-            <button className="text-sm font-medium text-yellow-600 hover:text-yellow-500">
-              View All Decks
-            </button>
-          </Link>
+          {decks.length > 0 && (
+            <Link href="/dashboard/decks">
+              <button className="text-sm font-medium text-yellow-600 hover:text-yellow-500">
+                View All Decks
+              </button>
+            </Link>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -11,19 +11,12 @@ import DeckForm from "@/app/_components/DeckForm";
 
 export default function Decks() {
   const { user } = useAuth();
-  const { fetchDecks, decks, isLoading, deleteDeck } = useStudy();
+  const { decks, isLoading, deleteDeck } = useStudy();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all"); // all, recent, mastered
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDeck, setSelectedDeck] = useState(null);
-
-  useEffect(() => {
-    const fetchDecksOnLoad = async () => {
-      await fetchDecks();
-    };
-    fetchDecksOnLoad();
-  }, []);
 
   // Filter decks based on search term and filter option
   const filteredDecks = decks.filter((deck) => {
@@ -66,7 +59,6 @@ export default function Decks() {
   const handleDeleteDeck = async (deckId) => {
     // Implement the delete logic here
     await deleteDeck(deckId);
-    console.log("Deleting deck:", deckId);
   };
 
   return (

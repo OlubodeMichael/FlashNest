@@ -14,8 +14,6 @@ export default function Deck({ deck, onDelete }) {
 
   // Get the deck ID, handling both id and _id properties
   const deckId = deck.id || deck._id;
-  console.log("Deck data:", deck);
-  console.log("Created at:", deck.createdAt);
 
   // Format the creation date
   const formatDate = (date) => {
@@ -23,7 +21,6 @@ export default function Deck({ deck, onDelete }) {
     try {
       const d = new Date(date);
       if (isNaN(d.getTime())) {
-        console.log("Invalid date:", date);
         return "Invalid date";
       }
       return d.toLocaleDateString("en-US", {

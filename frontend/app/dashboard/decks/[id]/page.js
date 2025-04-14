@@ -18,8 +18,6 @@ export default function DeckDetails() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
-  console.log(deck);
-
   useEffect(() => {
     const loadDeck = async () => {
       if (!params?.id) {

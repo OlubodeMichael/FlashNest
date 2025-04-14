@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthProvider";
 import { useRouter } from "next/navigation";
 
 export default function Signup() {
+  const { signup, isLoading, error } = useAuth();
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -15,7 +17,6 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const validate = () => {
@@ -49,35 +50,18 @@ export default function Signup() {
 
     if (!validate()) return;
 
-    setIsLoading(true);
-
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-        }),
+      await signup({
+        firstName,
+        lastName,
+        email,
+        password,
+        passwordConfirm: confirmPassword,
       });
 
-      if (response.ok) {
-        router.push("/login?registered=true");
-      } else {
-        const data = await response.json();
-        setErrors({
-          form: data.message || "Registration failed. Please try again.",
-        });
-      }
+      router.push("/dashboard");
     } catch (error) {
       setErrors({ form: "An error occurred. Please try again later." });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -107,6 +91,12 @@ export default function Signup() {
             Join FlashNest and start mastering your subjects with flashcards.
           </p>
 
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
+              <p>{error}</p>
+            </div>
+          )}
+
           {errors.form && (
             <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
               <p>{errors.form}</p>
@@ -130,7 +120,7 @@ export default function Signup() {
                     errors.firstName ? "border-red-500" : "border-gray-300"
                   } rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700`}
                   placeholder="John"
-                  required
+                  autoFocus
                 />
                 {errors.firstName && (
                   <p className="mt-1 text-sm text-red-600">
@@ -153,7 +143,6 @@ export default function Signup() {
                     errors.lastName ? "border-red-500" : "border-gray-300"
                   } rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700`}
                   placeholder="Doe"
-                  required
                 />
                 {errors.lastName && (
                   <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
@@ -176,7 +165,6 @@ export default function Signup() {
                   errors.email ? "border-red-500" : "border-gray-300"
                 } rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base text-gray-700`}
                 placeholder="your@email.com"
-                required
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -199,7 +187,6 @@ export default function Signup() {
                     errors.password ? "border-red-500" : "border-gray-300"
                   } text-gray-700 rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base`}
                   placeholder="••••••••"
-                  required
                 />
                 <button
                   type="button"
@@ -260,7 +247,6 @@ export default function Signup() {
                       : "border-gray-300"
                   } text-gray-700 rounded-lg focus:ring-yellow-400 focus:border-yellow-400 text-base`}
                   placeholder="••••••••"
-                  required
                 />
                 <button
                   type="button"

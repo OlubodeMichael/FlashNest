@@ -75,12 +75,10 @@ export default function FlashcardForm({
 
       if (flashcard) {
         // Update existing flashcard
-        console.log("Updating flashcard with ID:", flashcard._id);
         await updateFlashcard(formData.deckId, flashcard._id, flashcardData);
         toast.success("Flashcard updated successfully!");
       } else {
         // Create new flashcard
-        console.log("Creating flashcard for deck:", formData.deckId);
         await createFlashcard(formData.deckId, flashcardData);
         toast.success("Flashcard created successfully!");
       }

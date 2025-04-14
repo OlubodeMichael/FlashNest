@@ -3,38 +3,32 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStudy } from "@/context/StudyContext";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Flashcard from "@/app/_components/flashcard";
 
-export default function Study({ params }) {
-  const { fetchDeckById, fetchFlashcards } = useStudy();
-  const [deck, setDeck] = useState(null);
-  const [flashcards, setFlashcards] = useState([]);
+export default function Study() {
+  const { studyId } = useParams();
+  const { fetchDeck, fetchFlashcards, deck, flashcards, isLoading } =
+    useStudy();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  console.log(studyId);
 
+  const card = flashcards?.data?.flashcards?.[currentIndex] || null;
+  console.log(card);
   useEffect(() => {
     const loadDeckAndCards = async () => {
-      try {
-        setIsLoading(true);
-        const deckData = await fetchDeckById(params.stuydId);
-        const cardsData = await fetchFlashcards(params.stuydId);
-        setDeck(deckData);
-        setFlashcards(cardsData);
-      } catch (error) {
-        console.error("Error loading deck and flashcards:", error);
-      } finally {
-        setIsLoading(false);
-      }
+      await fetchDeck(studyId);
+      await fetchFlashcards(studyId);
     };
 
     loadDeckAndCards();
-  }, [params.stuydId]);
+  }, [studyId]);
 
   const handleNext = () => {
     setIsFlipped(false);
-    if (currentIndex < flashcards.length - 1) {
+    if (currentIndex < (flashcards?.data?.flashcards?.length || 0) - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
   };
@@ -56,9 +50,15 @@ export default function Study({ params }) {
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  }, [flashcards?.data?.flashcards?.length]);
 
   if (isLoading) {
     return (
@@ -75,9 +75,9 @@ export default function Study({ params }) {
         <div>
           <div className="flex items-center gap-2">
             <Link
-              href="/dashboard/decks"
+              href="/dashboard/study"
               className="text-gray-500 hover:text-gray-700">
-              ← Back to Decks
+              ← Back to Study
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mt-2">
@@ -88,7 +88,7 @@ export default function Study({ params }) {
       </div>
 
       {/* Flashcard Section */}
-      {flashcards.length > 0 ? (
+      {flashcards?.data?.flashcards?.length > 0 ? (
         <div className="flex flex-col items-center space-y-6">
           <div className="w-full max-w-2xl">
             <AnimatePresence mode="wait">
@@ -98,14 +98,14 @@ export default function Study({ params }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}>
                 <Flashcard
-                  deck={{
-                    question: flashcards[currentIndex].question,
-                    answer: flashcards[currentIndex].answer,
-                    deckName: deck?.title,
-                    cardNumber: `${currentIndex + 1}/${flashcards.length}`,
-                    hint: flashcards[currentIndex].hint,
-                    tags: flashcards[currentIndex].tags,
-                  }}
+                  front={card?.question || ""}
+                  back={card?.answer || ""}
+                  deckName={deck?.title}
+                  cardNumber={`${currentIndex + 1}/${
+                    flashcards?.data?.flashcards?.length || 0
+                  }`}
+                  hint={card?.hint}
+                  tags={card?.tags}
                   isFlipped={isFlipped}
                   onFlip={() => setIsFlipped((prev) => !prev)}
                 />
@@ -123,7 +123,9 @@ export default function Study({ params }) {
             </button>
             <button
               onClick={handleNext}
-              disabled={currentIndex === flashcards.length - 1}
+              disabled={
+                currentIndex === (flashcards?.data?.flashcards?.length || 0) - 1
+              }
               className="px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed">
               Next
             </button>
