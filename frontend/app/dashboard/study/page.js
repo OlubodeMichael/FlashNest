@@ -18,6 +18,7 @@ export default function Study() {
   );
 
   const handleDeckClick = (deckId) => {
+    console.log(deckId);
     router.push(`/dashboard/study/${deckId}`);
   };
 

@@ -182,10 +182,11 @@ function StudyProvider({ children }) {
   };
 
   const fetchFlashcards = async (deckId) => {
-    setFlashcards([]);
+    setFlashcards([]); // ✅ clear first
     try {
       setIsLoading(true);
       setError(null);
+
       const res = await fetch(`${apiUrl}/decks/${deckId}/flashcards`, {
         method: "GET",
         headers: {
@@ -199,12 +200,11 @@ function StudyProvider({ children }) {
       }
 
       const data = await res.json();
-      setFlashcards(data);
+      setFlashcards(data.data.flashcards); // ✅ just the array
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
-      setError(null);
     }
   };
 

@@ -8,27 +8,31 @@ import Link from "next/link";
 import Flashcard from "@/app/_components/flashcard";
 
 export default function Study() {
-  const { studyId } = useParams();
+  const { id } = useParams();
   const { fetchDeck, fetchFlashcards, deck, flashcards, isLoading } =
     useStudy();
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  console.log(studyId);
 
-  const card = flashcards?.data?.flashcards?.[currentIndex] || null;
-  console.log(card);
+  const card = flashcards[currentIndex] || null;
+
   useEffect(() => {
     const loadDeckAndCards = async () => {
-      await fetchDeck(studyId);
-      await fetchFlashcards(studyId);
+      await fetchDeck(id);
+      await fetchFlashcards(id);
     };
-
     loadDeckAndCards();
-  }, [studyId]);
+  }, [id]);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  }, [flashcards.length]);
 
   const handleNext = () => {
     setIsFlipped(false);
-    if (currentIndex < (flashcards?.data?.flashcards?.length || 0) - 1) {
+    if (currentIndex < flashcards.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
   };
@@ -50,15 +54,9 @@ export default function Study() {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
-
-  useEffect(() => {
-    setCurrentIndex(0);
-    setIsFlipped(false);
-  }, [flashcards?.data?.flashcards?.length]);
 
   if (isLoading) {
     return (
@@ -88,7 +86,7 @@ export default function Study() {
       </div>
 
       {/* Flashcard Section */}
-      {flashcards?.data?.flashcards?.length > 0 ? (
+      {flashcards.length > 0 ? (
         <div className="flex flex-col items-center space-y-6">
           <div className="w-full max-w-2xl">
             <AnimatePresence mode="wait">
@@ -101,9 +99,7 @@ export default function Study() {
                   front={card?.question || ""}
                   back={card?.answer || ""}
                   deckName={deck?.title}
-                  cardNumber={`${currentIndex + 1}/${
-                    flashcards?.data?.flashcards?.length || 0
-                  }`}
+                  cardNumber={`${currentIndex + 1}/${flashcards.length}`}
                   hint={card?.hint}
                   tags={card?.tags}
                   isFlipped={isFlipped}
@@ -123,9 +119,7 @@ export default function Study() {
             </button>
             <button
               onClick={handleNext}
-              disabled={
-                currentIndex === (flashcards?.data?.flashcards?.length || 0) - 1
-              }
+              disabled={currentIndex === flashcards.length - 1}
               className="px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed">
               Next
             </button>
