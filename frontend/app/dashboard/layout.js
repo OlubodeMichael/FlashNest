@@ -167,14 +167,14 @@ export default function DashboardLayout({ children }) {
         <div className="h-full flex flex-col">
           {/* Logo */}
           <div className="flex-shrink-0 px-4 py-4 border-b border-gray-200">
-            <Link href="/" className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
               <div className="h-10 w-10 bg-yellow-400 rounded-lg flex items-center justify-center shadow-sm">
                 <span className="font-bold text-base text-black">FN</span>
               </div>
               <span className="font-bold text-xl tracking-tight text-black">
                 FlashNest
               </span>
-            </Link>
+            </div>
           </div>
 
           {/* Navigation */}

@@ -4,8 +4,9 @@ import { useState } from "react";
 import Modal from "./Modal";
 import DeckForm from "./DeckForm";
 import { useStudy } from "@/context/StudyContext";
+import { formatDate } from "@/utils/dateUtils";
 
-export default function Deck({ deck, onDelete }) {
+export default function Deck({ deck, onDelete, type }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState("");
@@ -14,25 +15,6 @@ export default function Deck({ deck, onDelete }) {
 
   // Get the deck ID, handling both id and _id properties
   const deckId = deck.id || deck._id;
-
-  // Format the creation date
-  const formatDate = (date) => {
-    if (!date) return "Unknown date";
-    try {
-      const d = new Date(date);
-      if (isNaN(d.getTime())) {
-        return "Invalid date";
-      }
-      return d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return "Error formatting date";
-    }
-  };
 
   // Handle delete confirmation
   const handleDeleteConfirm = () => {
@@ -97,7 +79,9 @@ export default function Deck({ deck, onDelete }) {
           {/* Actions */}
           <div className="mt-4 flex space-x-3">
             <Link
-              href={`/dashboard/decks/${deckId}/`}
+              href={`/dashboard/${
+                type === "study" ? "study" : "decks"
+              }/${deckId}/`}
               className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 transition-colors duration-200 rounded-lg px-4 py-2 text-sm font-medium text-center">
               View
             </Link>

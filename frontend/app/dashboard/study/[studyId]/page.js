@@ -1,67 +1,64 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useStudy } from "@/context/StudyContext";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Flashcard from "@/app/_components/flashcard";
+import FlashcardViewer from "@/app/_components/FlashcardViewer";
+import FlashcardList from "@/app/_components/FlashcardList";
 
 export default function Study() {
-  const { id } = useParams();
-  const { fetchDeck, fetchFlashcards, deck, flashcards, isLoading } =
-    useStudy();
-
+  const params = useParams();
+  const { fetchDeck, deck, isLoading } = useStudy();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const card = flashcards[currentIndex] || null;
 
   useEffect(() => {
-    const loadDeckAndCards = async () => {
-      await fetchDeck(id);
-      await fetchFlashcards(id);
-    };
-    loadDeckAndCards();
-  }, [id]);
+    const loadDeck = async () => {
+      if (!params?.studyId) {
+        console.error("Study ID is undefined");
+        return;
+      }
 
+      // Reset state when loading a new deck
+      setCurrentIndex(0);
+
+      // Fetch the deck (which includes flashcards)
+      await fetchDeck(params.studyId);
+    };
+
+    loadDeck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params?.studyId]);
+
+  // Reset card index when flashcards change
   useEffect(() => {
     setCurrentIndex(0);
-    setIsFlipped(false);
-  }, [flashcards.length]);
+  }, [deck?.flashcards?.length]);
 
-  const handleNext = () => {
-    setIsFlipped(false);
-    if (currentIndex < flashcards.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    }
+  const handleCardChange = (newIndex) => {
+    setCurrentIndex(newIndex);
   };
-
-  const handlePrevious = () => {
-    setIsFlipped(false);
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "ArrowRight") handleNext();
-    if (e.key === "ArrowLeft") handlePrevious();
-    if (e.key === " ") {
-      e.preventDefault();
-      setIsFlipped((prev) => !prev);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, []);
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500"></div>
+      </div>
+    );
+  }
+
+  if (!deck) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-gray-800">Deck not found</h2>
+        <p className="text-gray-500 mt-2">
+          The deck you're looking for doesn't exist.
+        </p>
+        <Link href="/dashboard/study">
+          <button className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg transition-colors shadow-sm">
+            Back to Study Mode
+          </button>
+        </Link>
       </div>
     );
   }
@@ -75,7 +72,7 @@ export default function Study() {
             <Link
               href="/dashboard/study"
               className="text-gray-500 hover:text-gray-700">
-              ← Back to Study
+              ← Back to Study Mode
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mt-2">
@@ -86,61 +83,31 @@ export default function Study() {
       </div>
 
       {/* Flashcard Section */}
-      {flashcards.length > 0 ? (
-        <div className="flex flex-col items-center space-y-6">
-          <div className="w-full max-w-2xl">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}>
-                <Flashcard
-                  front={card?.question || ""}
-                  back={card?.answer || ""}
-                  deckName={deck?.title}
-                  cardNumber={`${currentIndex + 1}/${flashcards.length}`}
-                  hint={card?.hint}
-                  tags={card?.tags}
-                  isFlipped={isFlipped}
-                  onFlip={() => setIsFlipped((prev) => !prev)}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Navigation Controls */}
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              Previous
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === flashcards.length - 1}
-              className="px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed">
-              Next
-            </button>
-          </div>
-
-          {/* Keyboard Shortcuts */}
-          <div className="text-sm text-gray-500 text-center">
-            <p>Keyboard shortcuts:</p>
-            <p>Space - Flip card • ← Previous • → Next</p>
-          </div>
-        </div>
+      {deck.flashcards && deck.flashcards.length > 0 ? (
+        <FlashcardViewer
+          flashcards={deck.flashcards}
+          initialIndex={currentIndex}
+          onCardChange={handleCardChange}
+          deckName={deck?.title}
+        />
       ) : (
         <div className="text-center py-12">
           <p className="text-gray-500">No flashcards found in this deck.</p>
           <Link
-            href="/dashboard/decks"
+            href="/dashboard/study"
             className="text-yellow-600 hover:text-yellow-700 font-medium mt-2 inline-block">
-            Return to Decks
+            Return to Study Mode
           </Link>
         </div>
       )}
+
+      {/* All Flashcards List */}
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          All Flashcards
+        </h2>
+        <FlashcardList flashcards={deck.flashcards} layout="list" />
+      </div>
     </div>
   );
 }
