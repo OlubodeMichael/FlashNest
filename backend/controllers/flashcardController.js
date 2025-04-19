@@ -33,6 +33,32 @@ exports.createFlashcard = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.bulkCreateFlashcards = catchAsync(async (req, res, next) => {
+  const { deckId } = req.params;
+  const { flashcards } = req.body;
+
+  if (!Array.isArray(flashcards) || flashcards.length === 0) {
+    return next(new AppError("Flashcards array is required", 400));
+  }
+
+  // Attach deckId and userId to each card
+  const flashcardsToInsert = flashcards.map((card) => ({
+    ...card,
+    deckId,
+    userId: req.user._id,
+  }));
+
+  const insertedFlashcards = await Flashcard.insertMany(flashcardsToInsert);
+
+  res.status(201).json({
+    status: "success",
+    result: insertedFlashcards.length,
+    data: {
+      flashcards: insertedFlashcards,
+    },
+  });
+});
+
 exports.getFlashcard = catchAsync(async (req, res, next) => {
   const flashcard = await Flashcard.findById(req.params.id);
 

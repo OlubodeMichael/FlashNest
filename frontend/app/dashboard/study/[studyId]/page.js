@@ -63,6 +63,8 @@ export default function Study() {
     );
   }
 
+  const hasFlashcards = deck.flashcards && deck.flashcards.length > 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
       {/* Header */}
@@ -83,7 +85,7 @@ export default function Study() {
       </div>
 
       {/* Flashcard Section */}
-      {deck.flashcards && deck.flashcards.length > 0 ? (
+      {hasFlashcards ? (
         <FlashcardViewer
           flashcards={deck.flashcards}
           initialIndex={currentIndex}
@@ -101,13 +103,15 @@ export default function Study() {
         </div>
       )}
 
-      {/* All Flashcards List */}
-      <div className="mt-12">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          All Flashcards
-        </h2>
-        <FlashcardList flashcards={deck.flashcards} layout="list" />
-      </div>
+      {/* All Flashcards List - Only show if there are flashcards */}
+      {hasFlashcards && (
+        <div className="mt-12">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            All Flashcards
+          </h2>
+          <FlashcardList flashcards={deck.flashcards} layout="list" />
+        </div>
+      )}
     </div>
   );
 }

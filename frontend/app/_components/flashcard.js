@@ -31,12 +31,12 @@ export default function Flashcard({
 
   return (
     <div
-      className={`w-[320px] h-72 relative perspective-[1000px] select-none ${className}`}
+      className={`w-[400px] h-[280px] relative perspective-[1000px] select-none ${className}`}
       onClick={handleFlip}>
       <div className="w-full h-full relative">
         {/* Front of Card (Question) */}
         <motion.div
-          className="w-full h-full absolute rounded-xl shadow-lg overflow-hidden"
+          className="w-full h-full absolute rounded-2xl shadow-lg overflow-hidden"
           initial={false}
           animate={{
             rotateY: isFlipped ? 180 : 0,
@@ -47,39 +47,46 @@ export default function Flashcard({
             backfaceVisibility: "hidden",
             transformStyle: "preserve-3d",
           }}>
-          <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-500 p-8 flex flex-col">
+          <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-500 p-6 flex flex-col">
             {/* Card Header */}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-xs font-medium text-yellow-900 bg-yellow-200/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-medium text-yellow-900 bg-yellow-200/60 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
                 {deckName}
               </span>
-              <span className="text-xs font-medium text-yellow-900 bg-white/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+              <span className="text-xs font-medium text-yellow-900 bg-white/70 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
                 {cardNumber}
               </span>
             </div>
 
-            {/* Card Content */}
-            <div className="flex-grow flex flex-col justify-center items-center text-center">
-              <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 leading-tight">
-                {front}
-              </h3>
+            {/* Main Content Container - Takes up all available space */}
+            <div className="flex-1 flex items-center justify-center">
+              {/* Card Content */}
+              <div className="w-full max-w-sm text-center">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug tracking-tight mb-4">
+                  {front}
+                </h3>
 
-              {/* Hint (Optional) */}
-              {hint && (
-                <p className="text-yellow-800/80 text-sm md:text-base mb-8">
-                  {hint}
-                </p>
-              )}
+                {/* Hint (Optional) */}
+                {hint && (
+                  <div className="bg-yellow-300/20 backdrop-blur-sm rounded-lg p-3">
+                    <p className="text-yellow-900/90 text-sm font-medium">
+                      Hint: {hint}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
 
-              {/* Interaction Indicator */}
-              <div className="mt-auto flex items-center text-yellow-900/70 gap-1.5">
+            {/* Interaction Indicator */}
+            <div className="flex items-center justify-center">
+              <div className="flex items-center text-yellow-900/70 gap-2 bg-yellow-300/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
                 <svg
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   viewBox="0 0 20 20"
                   fill="currentColor">
                   <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                 </svg>
-                <span className="text-xs md:text-sm font-medium">
+                <span className="text-xs font-medium">
                   Tap to reveal answer
                 </span>
               </div>
@@ -89,7 +96,7 @@ export default function Flashcard({
 
         {/* Back of Card (Answer) */}
         <motion.div
-          className="w-full h-full absolute rounded-xl shadow-lg overflow-hidden"
+          className="w-full h-full absolute rounded-2xl shadow-lg overflow-hidden"
           initial={{ rotateY: 180 }}
           animate={{
             rotateY: isFlipped ? 0 : -180,
@@ -100,40 +107,45 @@ export default function Flashcard({
             backfaceVisibility: "hidden",
             transformStyle: "preserve-3d",
           }}>
-          <div className="w-full h-full bg-white p-8 flex flex-col">
+          <div className="w-full h-full bg-white p-6 flex flex-col">
             {/* Card Header */}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-xs font-medium text-yellow-900 bg-yellow-200/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-medium text-yellow-900 bg-yellow-200/60 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
                 {deckName}
               </span>
-              <span className="text-xs font-medium text-yellow-900 bg-yellow-400/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+              <span className="text-xs font-medium text-yellow-900 bg-yellow-400/70 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
                 {cardNumber}
               </span>
             </div>
 
-            {/* Card Content */}
-            <div className="flex-grow flex flex-col justify-center items-center text-center">
-              <p className="text-gray-700 text-sm md:text-base lg:text-lg mb-4 max-w-xs">
-                {back}
-              </p>
+            {/* Main Content Container - Takes up all available space */}
+            <div className="flex-1 flex items-center justify-center">
+              {/* Card Content */}
+              <div className="w-full max-w-sm text-center">
+                <p className="text-gray-700 text-lg font-medium leading-relaxed mb-4">
+                  {back}
+                </p>
 
-              {/* Tags - Optional */}
-              {tags && tags.length > 0 && (
-                <div className="flex gap-2 mb-6">
-                  {tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-xs md:text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+                {/* Tags - Optional */}
+                {tags && tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="text-xs font-medium bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
-              {/* Interaction Indicator */}
-              <div className="mt-auto flex items-center text-gray-500 gap-1.5">
+            {/* Interaction Indicator */}
+            <div className="flex items-center justify-center">
+              <div className="flex items-center text-gray-500 gap-2 bg-gray-50 px-3 py-1.5 rounded-full">
                 <svg
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   viewBox="0 0 20 20"
                   fill="currentColor">
                   <path
@@ -142,7 +154,7 @@ export default function Flashcard({
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-xs md:text-sm font-medium">
+                <span className="text-xs font-medium">
                   Tap to return to question
                 </span>
               </div>
