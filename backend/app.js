@@ -11,6 +11,7 @@ const hpp = require("hpp");
 const userRoute = require("./routes/usersRoute");
 const decksRoute = require("./routes/DecksRoute");
 const flashcardsRoute = require("./routes/flashcardsRoute");
+const aiRoute = require("./routes/aiRoute");
 
 const app = express();
 const limiter = rateLimit({
@@ -38,6 +39,7 @@ app.use(
 app.use("/api/users", userRoute);
 app.use("/api/decks", decksRoute);
 app.use("/api/flashcards", flashcardsRoute);
+app.use("/api/ai", aiRoute);
 
 app.use((err, req, res, next) => {
   console.error("ERROR 💥", err);
