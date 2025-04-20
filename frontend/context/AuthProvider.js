@@ -9,7 +9,7 @@ function AuthProvider({ children }) {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiUrl = "http://localhost:8000/api";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
   // 🔄 Fetch current user info from /users/me
   const fetchUser = async () => {

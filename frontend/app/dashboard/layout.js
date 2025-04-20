@@ -94,8 +94,8 @@ export default function DashboardLayout({ children }) {
     },
 
     {
-      name: "Study Mode",
-      path: "/dashboard/study",
+      name: "Generate Flashcards",
+      path: "/dashboard/generate",
       icon: (
         <svg
           className="w-5 h-5"
