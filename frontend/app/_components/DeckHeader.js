@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { formatDate } from "../../utils/dateUtils";
+import Modal from "./Modal";
+import DeckForm from "./DeckForm";
 
 /**
  * DeckHeader component for displaying deck information and actions
@@ -13,6 +15,7 @@ import { formatDate } from "../../utils/dateUtils";
  * @param {number} props.cardCount - Number of flashcards in the deck
  * @param {string} props.deckId - Unique identifier for the deck
  * @param {string} [props.className] - Additional CSS classes
+ * @param {Object} props.deck - The full deck object for editing
  */
 export default function DeckHeader({
   title,
@@ -21,7 +24,16 @@ export default function DeckHeader({
   cardCount,
   deckId,
   className = "",
+  deck,
 }) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleEditSuccess = () => {
+    setIsEditModalOpen(false);
+    // Optionally refresh the page or update the UI
+    window.location.reload();
+  };
+
   return (
     <div className={`bg-white rounded-xl shadow-sm p-6 ${className}`}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -53,18 +65,25 @@ export default function DeckHeader({
           </div>
         </div>
         <div className="flex space-x-3">
-          <Link href={`/dashboard/decks/${deckId}/edit`}>
+          <div onClick={() => setIsEditModalOpen(true)}>
             <button className="bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200 rounded-lg px-4 py-2 text-sm font-medium">
               Edit Deck
             </button>
-          </Link>
-          <Link href={`/dashboard/study?deck=${deckId}`}>
-            <button className="bg-yellow-400 text-black hover:bg-yellow-500 transition-colors duration-200 rounded-lg px-4 py-2 text-sm font-medium">
-              Study Now
-            </button>
-          </Link>
+          </div>
         </div>
       </div>
+
+      {/* Edit Deck Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Deck">
+        <DeckForm
+          deck={deck}
+          onSuccess={handleEditSuccess}
+          onCancel={() => setIsEditModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

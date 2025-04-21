@@ -1,4 +1,6 @@
 // context/AiContext.js
+"use client";
+
 import { createContext, useContext, useState } from "react";
 
 const AiContext = createContext();

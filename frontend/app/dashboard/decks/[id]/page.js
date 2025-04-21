@@ -94,6 +94,7 @@ export default function DeckDetails() {
         createdAt={deck.createdAt}
         cardCount={deck.flashcards?.length || 0}
         deckId={deck._id}
+        deck={deck}
       />
 
       {/* Flashcards Section */}

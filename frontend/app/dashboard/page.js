@@ -8,7 +8,7 @@ import Deck from "@/app/_components/deck";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { decks } = useStudy();
+  const { decks, deleteDeck } = useStudy();
   const totalFlashcards = decks.reduce(
     (total, deck) => total + deck?.flashcards.length,
     0
@@ -22,8 +22,13 @@ export default function Dashboard() {
     { label: "Time Studied", value: "24h 15m" },
   ];
 
+  const handleDeleteDeck = async (deckId) => {
+    // Implement the delete logic here
+    await deleteDeck(deckId);
+  };
+
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="min-h-screen overflow-y-auto pb-8">
       {/* Welcome Section */}
       <div className="mb-8">
         <motion.div
@@ -38,9 +43,9 @@ export default function Dashboard() {
             You have 15 cards due for review today.
           </p>
           <div className="mt-6">
-            <Link href="/dashboard/study">
+            <Link href="/dashboard/decks">
               <button className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg transition-colors shadow-sm">
-                Start Studying
+                Start Learning
               </button>
             </Link>
           </div>
@@ -85,7 +90,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}>
-              <Deck deck={deck} mode="study" />
+              <Deck deck={deck} mode="study" onDelete={handleDeleteDeck} />
             </motion.div>
           ))}
         </div>
