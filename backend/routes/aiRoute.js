@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const authController = require("../controllers/authController");
 const aiController = require("../controllers/aiController");
+const rateLimiter = require("../middleware/rateLimtter");
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -10,6 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post(
   "/preview-flashcards",
   authController.protect,
+  rateLimiter,
   upload.single("file"),
   aiController.previewFlashcards
 );
