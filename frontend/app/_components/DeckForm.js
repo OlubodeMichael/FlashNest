@@ -60,19 +60,35 @@ export default function DeckForm({ deck, onSuccess, onCancel }) {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-600 text-sm">{error}</p>
+        <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-red-500"
+                viewBox="0 0 20 20"
+                fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
-        <div>
+        <div className="space-y-1">
           <label
             htmlFor="title"
-            className="block text-sm font-medium text-gray-700 mb-1">
+            className="block text-sm font-medium text-gray-700">
             Title
-            <span className="text-red-500">*</span>
+            <span className="text-red-500 ml-1">*</span>
           </label>
           <input
             type="text"
@@ -81,16 +97,19 @@ export default function DeckForm({ deck, onSuccess, onCancel }) {
             value={formData.title}
             onChange={handleChange}
             placeholder="Enter deck title"
-            className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+            className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors"
             required
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Give your deck a descriptive title
+          </p>
         </div>
 
         {/* Description */}
-        <div>
+        <div className="space-y-1">
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1">
+            className="block text-sm font-medium text-gray-700">
             Description
           </label>
           <textarea
@@ -100,15 +119,18 @@ export default function DeckForm({ deck, onSuccess, onCancel }) {
             onChange={handleChange}
             placeholder="Enter deck description"
             rows={4}
-            className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+            className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Describe what this deck is about
+          </p>
         </div>
 
         {/* Category */}
-        <div>
+        <div className="space-y-1">
           <label
             htmlFor="category"
-            className="block text-sm font-medium text-gray-700 mb-1">
+            className="block text-sm font-medium text-gray-700">
             Category
           </label>
           <select
@@ -116,7 +138,7 @@ export default function DeckForm({ deck, onSuccess, onCancel }) {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="w-full px-3 py-2  text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+            className="w-full px-4 py-3 text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors appearance-none bg-white">
             <option value="">Select a category</option>
             <option value="language">Language</option>
             <option value="science">Science</option>
@@ -125,35 +147,58 @@ export default function DeckForm({ deck, onSuccess, onCancel }) {
             <option value="technology">Technology</option>
             <option value="other">Other</option>
           </select>
+          <div className="absolute right-0 top-0 mt-8 mr-4 pointer-events-none">
+            <svg
+              className="h-5 w-5 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Categorize your deck for better organization
+          </p>
         </div>
 
         {/* Public/Private Toggle */}
-        <div className="flex items-center">
+        <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="checkbox"
             id="isPublic"
             name="isPublic"
             checked={formData.isPublic}
             onChange={handleChange}
-            className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-300 rounded"
+            className="h-5 w-5 text-yellow-500 focus:ring-yellow-500 border-gray-300 rounded transition-colors"
           />
-          <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700">
-            Make this deck public
-          </label>
+          <div className="ml-3">
+            <label
+              htmlFor="isPublic"
+              className="text-sm font-medium text-gray-700">
+              Make this deck public
+            </label>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Others can discover and use your deck
+            </p>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 pt-4">
+        <div className="flex gap-4 pt-6 border-t border-gray-100">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+            className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
             Cancel
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-sm font-medium text-black bg-yellow-400 border border-transparent rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed">
+            className="flex-1 px-5 py-2.5 text-sm font-medium text-black bg-yellow-400 border border-transparent rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             {isLoading ? (
               <span className="flex items-center justify-center">
                 <svg

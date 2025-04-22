@@ -58,7 +58,7 @@ Format:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-4o",
+        model: "deepseek/deepseek-chat-v3-0324:free",
         max_tokens: 1000, // Limit tokens to stay within credit limit
         messages: [
           {
