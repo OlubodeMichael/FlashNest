@@ -3,6 +3,8 @@ const { promisify } = require("util");
 const User = require("./../models/User");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("../utils/appError");
+const welcomeEmailTemplate = require("./../config/templates/welcomeEmail");
+const sendEmail = require("./../config/email");
 
 const signToken = (user) => {
   return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -19,6 +21,20 @@ exports.signUp = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+  try {
+    const message = welcomeEmailTemplate(req.body.firstName);
+    console.log("Sending email to:", newUser.email); // 🔥 Add this
+    console.log("Email content:", message); // 🔥 And this
+
+    await sendEmail({
+      to: newUser.email,
+      subject: "Welcome to FlashNest",
+      html: message,
+    });
+  } catch (err) {
+    console.error("Email sending failed 💥:", err);
+  }
 
   const token = signToken(newUser);
 
@@ -118,3 +134,34 @@ exports.logout = (req, res) => {
     .status(200)
     .json({ status: "success", message: "Logged out successfully" });
 };
+
+exports.googleAuthCallback = catchAsync(async (req, res, next) => {
+  const googleUser = req.user;
+
+  if (!googleUser) {
+    return next(new AppError("Google authentication failed", 401));
+  }
+
+  // 🔥 Add Welcome Email Here!
+  try {
+    const message = welcomeEmailTemplate(googleUser.firstName);
+    await sendEmail({
+      to: googleUser.email,
+      subject: "Welcome to FlashNest 🎉",
+      html: message,
+    });
+  } catch (err) {
+    console.error("Email sending failed 💥:", err);
+  }
+
+  const token = signToken(googleUser);
+
+  res.cookie("jwt", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+  res.redirect("http://localhost:3000/dashboard");
+});

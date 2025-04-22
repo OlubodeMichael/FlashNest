@@ -6,12 +6,13 @@ const userSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, "user must have a first name"],
+      required: [true, "Please provide your first name"],
     },
     lastName: {
       type: String,
-      required: [true, "user must have a last name"],
+      required: [true, "Please provide your last name"],
     },
+
     email: {
       type: String,
       required: [true, "user must provide an email"],
@@ -20,15 +21,18 @@ const userSchema = mongoose.Schema(
       trim: true,
       validate: [validator.isEmail, "Please provide a valid email"],
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     password: {
       type: String,
-      required: [true, "A user must have a password"],
       minlength: 8,
       select: false,
     },
     passwordConfirm: {
       type: String,
-      required: [true, "Please confirm your password"],
       validate: {
         validator: function (val) {
           return val === this.password;
