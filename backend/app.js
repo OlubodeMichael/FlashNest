@@ -31,18 +31,21 @@ app.use(
 app.use(hpp()); // Prevent HTTP parameter pollution
 
 // 🌐 CORS setup
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Frontend URL (change in prod)
-    credentials: true, // Allow sending cookies
-  })
-);
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // 🛠️ Other middlewares
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
-app.use(passport.initialize()); // No session!
+app.use(passport.initialize());
 
 // 📦 Routes
 app.use("/api/users", userRoute);
