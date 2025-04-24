@@ -40,8 +40,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: false, // No HTTPS in dev
-    sameSite: "None", // Needed for cross-site (localhost → api.flashnest.app)
+    secure: false, // 🔥 No HTTPS right now
+    sameSite: "None", // 🔥 Required for cross-origin cookies
   });
 
   res.status(201).json({
@@ -73,8 +73,8 @@ exports.login = catchAsync(async (req, res, next) => {
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: false, // No HTTPS in dev
-    sameSite: "None", // Needed for cross-site (localhost → api.flashnest.app)
+    secure: false, // 🔥 No HTTPS right now
+    sameSite: "None", // 🔥 Required for cross-origin cookies
   });
 
   res.status(200).json({
