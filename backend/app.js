@@ -32,14 +32,14 @@ app.use(hpp()); // Prevent HTTP parameter pollution
 
 // 🌐 CORS setup
 const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true,
+  origin: "http://localhost:3000", // Frontend in dev
+  credentials: true, // 🔥 Allow cookies
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests
 
 // 🛠️ Other middlewares
 app.use(morgan("dev"));
