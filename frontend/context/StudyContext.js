@@ -12,7 +12,7 @@ function StudyProvider({ children }) {
   const [error, setError] = useState(null);
   const [aiResponse, setAiResponse] = useState(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const apiUrl = "http://localhost:8000/api";
 
   const testAi = async () => {
     try {

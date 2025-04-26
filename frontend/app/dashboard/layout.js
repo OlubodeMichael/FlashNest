@@ -258,6 +258,7 @@ export default function DashboardLayout({ children }) {
               <Link
                 key={item.path}
                 href={item.path}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                   isLinkActive(item.path)
                     ? "bg-yellow-50 text-yellow-700"

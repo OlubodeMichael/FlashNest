@@ -15,6 +15,14 @@ router.get(
   authController.googleAuthCallback
 );
 
+router.post("/forgotPassword", authController.forgotPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
+router.patch(
+  "/updateMyPassword",
+  authController.protect,
+  authController.updatePassword
+);
+
 router.post("/signup", authController.signUp);
 router.post("/login", authController.login);
 router.post("/logout", authController.logout);

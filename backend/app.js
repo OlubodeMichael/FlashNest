@@ -19,6 +19,7 @@ const app = express();
 
 // 🔐 Security middlewares
 app.use(helmet());
+/*
 app.use(
   rateLimit({
     max: 100,
@@ -26,26 +27,24 @@ app.use(
     message: "Too many requests from this IP, please try again in an hour",
   })
 );
+*/
 // app.use(xss());            // Optional: Prevent XSS attacks
 // app.use(mongoSanitize());  // Optional: Prevent NoSQL injection
 app.use(hpp()); // Prevent HTTP parameter pollution
 
 // 🌐 CORS setup
-const corsOptions = {
-  origin: "http://localhost:3000", // Frontend in dev
-  credentials: true, // 🔥 Allow cookies
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Frontend origin
+    credentials: true, // 🔥 Allows cookies
+  })
+);
 
 // 🛠️ Other middlewares
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
-app.use(passport.initialize());
+app.use(passport.initialize()); // No session!
 
 // 📦 Routes
 app.use("/api/users", userRoute);
