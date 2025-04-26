@@ -9,7 +9,7 @@ function AuthProvider({ children }) {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const apiUrl = "http://localhost:8000/api";
 
   // 🔄 Fetch current user info from /users/me
   const fetchUser = async () => {
@@ -127,14 +127,79 @@ function AuthProvider({ children }) {
     }
   };
 
+  //const forgotPassword = async (email) => {}
+
   // ✅ Optional: auto-fetch user on mount (uncomment if you want it)
   // useEffect(() => {
   //   fetchUser();
   // }, []);
 
+  const forgotPassword = async (email) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${apiUrl}/users/forgotPassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Forgot password failed");
+      }
+
+      await fetchUser();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (token, password, passwordConfirm) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${apiUrl}/users/resetPassword/${token}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ password, passwordConfirm }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Reset password failed");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setError(null);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, error, isLoading, signup, login, logout, fetchUser }}>
+      value={{
+        user,
+        error,
+        isLoading,
+        signup,
+        login,
+        logout,
+        fetchUser,
+        forgotPassword,
+        resetPassword,
+      }}>
       {children}
     </AuthContext.Provider>
   );
