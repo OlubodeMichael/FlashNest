@@ -18,7 +18,7 @@ export default function Dashboard() {
   const stats = [
     { label: "Total Flashcards", value: totalFlashcards },
     { label: "Cards Mastered", value: 84 },
-    { label: "Study Streak", value: "5 days" },
+    //{ label: "Study Streak", value: "5 days" },
     { label: "Time Studied", value: "24h 15m" },
   ];
 

@@ -187,6 +187,82 @@ function AuthProvider({ children }) {
     }
   };
 
+  const updateMe = async (data) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${apiUrl}/users/updateMe`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Update failed");
+      }
+      await fetchUser();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteMe = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${apiUrl}/users/deleteMe`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Delete failed");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updatePassword = async (passwordCurrent, password, passwordConfirm) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${apiUrl}/users/updateMyPassword`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          passwordCurrent,
+          password,
+          passwordConfirm,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Update password failed");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -199,6 +275,9 @@ function AuthProvider({ children }) {
         fetchUser,
         forgotPassword,
         resetPassword,
+        updateMe,
+        deleteMe,
+        updatePassword,
       }}>
       {children}
     </AuthContext.Provider>

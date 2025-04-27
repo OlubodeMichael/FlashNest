@@ -113,8 +113,8 @@ export default function DashboardLayout({ children }) {
       ),
     },
     {
-      name: "Settings",
-      path: "/dashboard/settings",
+      name: "Account Settings",
+      path: "/dashboard/account",
       icon: (
         <svg
           className="w-5 h-5"

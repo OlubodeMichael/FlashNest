@@ -16,6 +16,7 @@ export const AiProvider = ({ children }) => {
     try {
       setIsLoading(true);
       setError(null);
+      setAiFlashcards([]); // Clear previous flashcards
 
       const formData = new FormData();
       if (file) formData.append("file", file);
@@ -29,15 +30,25 @@ export const AiProvider = ({ children }) => {
         body: formData,
       });
 
+      // Check for network or server errors
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("❌ Server error response:", errorText);
+        throw new Error(`Server responded with status ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (data.status === "success") {
         setAiFlashcards(data.flashcards);
       } else {
-        setError(data.message || "AI failed to generate");
+        const errorMessage = data.message || "AI failed to generate flashcards";
+        console.error("❌ AI Error:", errorMessage);
+        setError(errorMessage);
       }
     } catch (err) {
-      setError("Something went wrong");
+      console.error("❌ Network or unexpected error:", err);
+      setError(err.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
