@@ -280,3 +280,21 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 4) Log the user in, send JWT
   createSendToken(user, 201, res);
 });
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from the collection
+  const user = await User.findById(req.user.id).select("+password");
+
+  // 2) check if Posted current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Incorrect current password", 401));
+  }
+
+  // 3)if so, update the password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // 4) Log the user in, send JWT
+  createSendToken(user, 201, res);
+});
