@@ -9,25 +9,21 @@ function AuthProvider({ children }) {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiUrl = "http://localhost:8000/api";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-  // 🔄 Fetch current user info from /users/me
   const fetchUser = async () => {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/me`, {
         credentials: "include",
       });
-
       if (!res.ok) {
         setUser(null);
         return;
       }
-
       const data = await res.json();
-      setUser(data.data.user); // ✅ correctly access user object
+      setUser(data.data.user);
     } catch (err) {
       console.error("Error fetching user:", err);
       setUser(null);
@@ -46,12 +42,9 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/signup`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           firstName,
@@ -61,12 +54,10 @@ function AuthProvider({ children }) {
           passwordConfirm,
         }),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Signup failed");
       }
-
       await fetchUser();
     } catch (err) {
       setError(err.message);
@@ -79,21 +70,16 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Login failed");
       }
-
       await fetchUser();
     } catch (err) {
       console.error("Login error:", err);
@@ -107,17 +93,14 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Logout failed");
       }
-
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);
@@ -127,33 +110,21 @@ function AuthProvider({ children }) {
     }
   };
 
-  //const forgotPassword = async (email) => {}
-
-  // ✅ Optional: auto-fetch user on mount (uncomment if you want it)
-  // useEffect(() => {
-  //   fetchUser();
-  // }, []);
-
   const forgotPassword = async (email) => {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/forgotPassword`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email }),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Forgot password failed");
       }
-
-      await fetchUser();
+      // ✅ No fetchUser() here
     } catch (err) {
       setError(err.message);
     } finally {
@@ -165,25 +136,22 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/resetPassword/${token}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ password, passwordConfirm }),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Reset password failed");
       }
+      await fetchUser(); // ✅ Fetch new user status after reset
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-      setError(null);
+      // ✅ Removed erroneous setError(null);
     }
   };
 
@@ -191,16 +159,12 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/updateMe`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Update failed");
@@ -217,16 +181,15 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/deleteMe`, {
         method: "DELETE",
         credentials: "include",
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Delete failed");
       }
+      setUser(null); // ✅ Explicitly set user state to null after deletion
     } catch (err) {
       setError(err.message);
     } finally {
@@ -238,12 +201,9 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch(`${apiUrl}/users/updateMyPassword`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           passwordCurrent,
@@ -251,17 +211,21 @@ function AuthProvider({ children }) {
           passwordConfirm,
         }),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || "Update password failed");
       }
+      await fetchUser(); // ✅ Fetch updated user after password update
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -286,9 +250,7 @@ function AuthProvider({ children }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
 
