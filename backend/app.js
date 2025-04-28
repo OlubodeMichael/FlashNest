@@ -50,7 +50,8 @@ const allowedOrigins = [
   "http://localhost:3000", // For local development frontend
   "https://flashnest.app", // Production frontend (root)
   "https://www.flashnest.app", // Production frontend (with www)
-  undefined, // For Postman (no Origin header)
+  undefined,
+  "postman"// For Postman (no Origin header)
 ];
 
 const corsOptions = {
