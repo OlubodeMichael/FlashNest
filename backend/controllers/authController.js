@@ -20,10 +20,9 @@ const getCookieOptions = () => ({
   httpOnly: true,
   secure: true,
   sameSite: "None",
+  domain: ".flashnest.app",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 });
-
-
 
 // Central Token Sending
 const createSendToken = (user, statusCode, req, res) => {
