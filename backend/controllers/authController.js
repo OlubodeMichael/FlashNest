@@ -13,20 +13,25 @@ const signToken = (user) => {
   });
 };
 
-const getCookieOptions = () => {
+const getCookieOptions = (req) => {
   const isProd = process.env.NODE_ENV === "production";
+  const host = req.hostname;  // 🔥 Get the request hostname
+
   return {
     httpOnly: true,
-    secure: isProd, // 🔥 TRUE for HTTPS backend
+    secure: isProd,
     sameSite: isProd ? "None" : "Lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    domain: isProd ? ".flashnest.app" : undefined,  // Force domain in production
   };
 };
+
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
-  res.cookie("jwt", token, getCookieOptions());
+  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+
 
   user.password = undefined;
   res.status(statusCode).json({
@@ -64,7 +69,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   const token = signToken(newUser);
 
-  res.cookie("jwt", token, getCookieOptions());
+  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+
 
   res.status(201).json({
     status: "success",
@@ -92,7 +98,8 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = signToken(user);
 
   // Set cookie with consistent settings
-  res.cookie("jwt", token, getCookieOptions());
+  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+
 
   // Remove password from output
   user.password = undefined;
@@ -182,7 +189,8 @@ exports.googleAuthCallback = catchAsync(async (req, res, next) => {
 
   const token = signToken(googleUser);
 
-  res.cookie("jwt", token, getCookieOptions());
+  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+
 
   res.redirect("http://localhost:3000/dashboard");
 });
