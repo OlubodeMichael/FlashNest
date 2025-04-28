@@ -10,7 +10,7 @@ export const AiProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiUrl = "http://localhost:8000/api";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
   const previewFlashcards = async ({ topic, text, file, count }) => {
     try {
