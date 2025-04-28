@@ -18,7 +18,7 @@ const getCookieOptions = () => {
   return {
     httpOnly: true,
     secure: false,
-    sameSite: isProd ? "None" : "Lax",
+    sameSite: "Lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 };
