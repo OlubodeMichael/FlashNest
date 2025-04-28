@@ -18,10 +18,12 @@ const signToken = (user) => {
 // Consistent Cookie Options
 const getCookieOptions = () => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  secure: true,
+  sameSite: "None",
   maxAge: 7 * 24 * 60 * 60 * 1000,
+  domain: ".flashnest.app",
 });
+
 
 // Central Token Sending
 const createSendToken = (user, statusCode, req, res) => {
