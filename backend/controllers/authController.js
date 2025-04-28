@@ -13,15 +13,18 @@ const signToken = (user) => {
   });
 };
 
-const getCookieOptions = () => {
+const getCookieOptions = (req) => {
   const isProd = process.env.NODE_ENV === "production";
+  const isSecure = isProd && req.headers["x-forwarded-proto"] === "https"; // 🔥 Check if HTTPS via Cloudflare
+
   return {
     httpOnly: true,
-    secure: false,
-    sameSite: "Lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: isSecure,                  // 🔥 Set secure only if HTTPS
+    sameSite: isProd ? "None" : "Lax", // 🔥 Allow cross-site cookies in production
+    maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days
   };
 };
+
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
