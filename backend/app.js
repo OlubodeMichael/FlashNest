@@ -33,12 +33,26 @@ app.use(
 app.use(hpp()); // Prevent HTTP parameter pollution
 
 // 🌐 CORS setup
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Frontend origin
-    credentials: true, // 🔥 Allows cookies
-  })
-);
+// 🌐 CORS setup
+const allowedOrigins = [
+  "http://localhost:3000", // For local development frontend
+  "https://flashnest.app", // Production frontend (root)
+  "https://www.flashnest.app", // Production frontend (with www)
+  undefined, // For Postman (no Origin header)
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // ✅ Allow
+    } else {
+      callback(new Error("Not allowed by CORS")); // ❌ Block others
+    }
+  },
+  credentials: true, // 🔥 Allow cookies (for JWT)
+};
+
+app.use(cors(corsOptions));
 
 // 🛠️ Other middlewares
 app.use(morgan("dev"));
