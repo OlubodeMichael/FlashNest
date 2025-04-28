@@ -27,7 +27,7 @@ const getCookieOptions = () => ({
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
   res.cookie("jwt", token, getCookieOptions());
-  
+
   user.password = undefined;
   res.status(statusCode).json({
     status: "success",
@@ -35,7 +35,6 @@ const createSendToken = (user, statusCode, req, res) => {
     data: { user },
   });
 };
-
 
 exports.signUp = catchAsync(async (req, res, next) => {
   // get the user information from the request
@@ -49,8 +48,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   try {
     const message = welcomeEmailTemplate(req.body.firstName);
-    console.log("Sending email to:", newUser.email); // 🔥 Add this
-    console.log("Email content:", message); // 🔥 And this
+    console.log("Sending email to:", newUser.email);
+    console.log("Email content:", message);
 
     await sendEmail({
       to: newUser.email,
@@ -61,17 +60,13 @@ exports.signUp = catchAsync(async (req, res, next) => {
     console.error("Email sending failed 💥:", err);
   }
 
-  const token = signToken(newUser);
-
-  createSendToken(newUser, 201, req, res)  // 🔥 Pass req
-
+  // Send only token and success status
+  const token = signToken(newUser._id);
+  res.cookie("jwt", token, getCookieOptions());
 
   res.status(201).json({
     status: "success",
     token,
-    user: {
-      user: newUser,
-    },
   });
 });
 
@@ -89,21 +84,13 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid email or password", 401));
   }
 
-  const token = signToken(user);
-
-  // Set cookie with consistent settings
-  createSendToken(user, 200, req, res);
-
-
-  // Remove password from output
-  user.password = undefined;
+  // Send only token and success status
+  const token = signToken(user._id);
+  res.cookie("jwt", token, getCookieOptions());
 
   res.status(200).json({
     status: "success",
     token,
-    data: {
-      user,
-    },
   });
 });
 
@@ -183,8 +170,7 @@ exports.googleAuthCallback = catchAsync(async (req, res, next) => {
 
   const token = signToken(googleUser);
 
-  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
-
+  res.cookie("jwt", token, getCookieOptions()); // 🔥 Pass req
 
   res.redirect("http://localhost:3000/dashboard");
 });
@@ -250,8 +236,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update change passwordAt property for the user
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 200, req, res)
-
+  createSendToken(user, 200, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -270,5 +255,4 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 4) Log the user in, send JWT
   createSendToken(user, 200, req, res);
-
 });
