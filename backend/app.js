@@ -17,6 +17,18 @@ const aiRoute = require("./routes/aiRoute");
 
 const app = express();
 
+app.set("trust proxy", true);  // 🔥 Trust NGINX/Cloudflare proxy
+
+// 🔄 Redirect HTTP to HTTPS (Production only)
+if (process.env.NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    if (req.headers["x-forwarded-proto"] !== "https") {
+      return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
+
 // 🔐 Security middlewares
 app.use(helmet());
 /*
