@@ -13,34 +13,29 @@ const signToken = (user) => {
   });
 };
 
-const getCookieOptions = () => {
-  const isProd = process.env.NODE_ENV === "production";
-  return {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "None" : "Lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    domain: isProd ? ".flashnest.app" : undefined,  // 🔥 Force domain directly!
-  };
-};
+// Inside your AuthController.js
 
+// Consistent Cookie Options
+const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
 
-
-const createSendToken = (user, statusCode, res) => {
+// Central Token Sending
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
-
-  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
-
-
+  res.cookie("jwt", token, getCookieOptions());
+  
   user.password = undefined;
   res.status(statusCode).json({
     status: "success",
     token,
-    data: {
-      user,
-    },
+    data: { user },
   });
 };
+
 
 exports.signUp = catchAsync(async (req, res, next) => {
   // get the user information from the request
@@ -68,7 +63,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   const token = signToken(newUser);
 
-  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
+  createSendToken(newUser, 201, req, res)  // 🔥 Pass req
 
 
   res.status(201).json({
@@ -97,7 +92,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = signToken(user);
 
   // Set cookie with consistent settings
-  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
+  createSendToken(user, 200, req, res);
 
 
   // Remove password from output
@@ -188,7 +183,7 @@ exports.googleAuthCallback = catchAsync(async (req, res, next) => {
 
   const token = signToken(googleUser);
 
-  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
 
 
   res.redirect("http://localhost:3000/dashboard");
@@ -255,7 +250,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update change passwordAt property for the user
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 201, req);  // ✅ Pass req
+  createSendToken(user, 200, req, res)
 
 });
 
@@ -274,6 +269,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 201, req);  // ✅ Pass req
+  createSendToken(user, 200, req, res);
 
 });
