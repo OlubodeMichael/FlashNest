@@ -13,24 +13,23 @@ const signToken = (user) => {
   });
 };
 
-const getCookieOptions = (req) => {
+const getCookieOptions = () => {
   const isProd = process.env.NODE_ENV === "production";
-  const host = req.hostname;  // 🔥 Get the request hostname
-
   return {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? "None" : "Lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    domain: isProd ? ".flashnest.app" : undefined,  // Force domain in production
+    domain: isProd ? ".flashnest.app" : undefined,  // 🔥 Force domain directly!
   };
 };
+
 
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
-  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
 
 
   user.password = undefined;
@@ -69,7 +68,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   const token = signToken(newUser);
 
-  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
 
 
   res.status(201).json({
@@ -98,7 +97,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = signToken(user);
 
   // Set cookie with consistent settings
-  res.cookie("jwt", token, getCookieOptions(req));  // 🔥 Pass req
+  res.cookie("jwt", token, getCookieOptions());  // 🔥 Pass req
 
 
   // Remove password from output
@@ -256,7 +255,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update change passwordAt property for the user
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 201, req, res);  // ✅ Pass req
+  createSendToken(user, 201, req);  // ✅ Pass req
 
 });
 
@@ -275,6 +274,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 201, req, res);  // ✅ Pass req
+  createSendToken(user, 201, req);  // ✅ Pass req
 
 });
