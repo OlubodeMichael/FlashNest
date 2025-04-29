@@ -49,22 +49,21 @@ app.use(hpp()); // Prevent HTTP parameter pollution
 // 🌐 CORS setup
 // 🌐 CORS setup
 const allowedOrigins = [
-  "http://localhost:3000", // For local development frontend
-  "https://flashnest.app", // Production frontend (root)
-  "https://www.flashnest.app", // Production frontend (with www)
-  undefined,
-  "postman", // For Postman (no Origin header)
+  "http://localhost:3000",
+  "https://flashnest.app",
+  "https://www.flashnest.app",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow requests with no origin (like Postman or server-to-server)
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true); // ✅ Allow
+      callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS")); // ❌ Block others
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // 🔥 Allow cookies (for JWT)
+  credentials: true,
 };
 
 app.use(cors(corsOptions));

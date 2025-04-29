@@ -17,10 +17,18 @@ const signToken = (user) => {
 
 // Consistent Cookie Options
 const getCookieOptions = () => ({
+  /*
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "Lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  sameSite: "lax",
+  maxAge: 7 * 24 * 60 * 60,
+  path: "/",
+  */
+  httpOnly: true,
+  secure: true, // must be true for SameSite: "none"
+  sameSite: "none",
+  domain: ".flashnest.app", // allows cookie on all subdomains
+  maxAge: 7 * 24 * 60 * 60 * 1000, // or seconds, as needed
   path: "/",
 });
 
