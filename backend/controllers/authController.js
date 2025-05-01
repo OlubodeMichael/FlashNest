@@ -16,21 +16,18 @@ const signToken = (user) => {
 // Inside your AuthController.js
 
 // Consistent Cookie Options
-const getCookieOptions = () => ({
-  /*
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
-  maxAge: 7 * 24 * 60 * 60,
-  path: "/",
-  */
-  httpOnly: true,
-  secure: true, // must be true for SameSite: "none"
-  sameSite: "none",
-  domain: ".flashnest.app", // allows cookie on all subdomains
-  maxAge: 7 * 24 * 60 * 60 * 1000, // or seconds, as needed
-  path: "/",
-});
+const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    domain: isProduction ? ".flashnest.app" : undefined, // Only set domain in production
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
+  };
+};
 
 // Central Token Sending
 const createSendToken = (user, statusCode, req, res) => {

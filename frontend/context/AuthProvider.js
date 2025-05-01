@@ -223,9 +223,12 @@ function AuthProvider({ children }) {
     }
   };
 
+  /*
   useEffect(() => {
     fetchUser();
   }, []);
+
+  */
 
   return (
     <AuthContext.Provider

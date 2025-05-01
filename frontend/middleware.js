@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 export async function middleware(req) {
+  /*
   const { pathname } = req.nextUrl;
 
   if (!process.env.JWT_SECRET) {
@@ -42,6 +43,7 @@ export async function middleware(req) {
     response.cookies.set("jwt", "", { maxAge: 0, path: "/" });
     return response;
   }
+  */
 }
 
 export const config = {
