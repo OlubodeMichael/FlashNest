@@ -22,14 +22,6 @@ export default function DashboardLayout({ children }) {
     fetchUserOnLoad();
   }, []);
 
-  // Get user initials for profile display
-  const getUserInitials = () => {
-    if (user && user.firstName && user.lastName) {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
-    }
-    return "MO"; // Default to Michael Olubode initials
-  };
-
   const handleLogout = async () => {
     try {
       await logout();

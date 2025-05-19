@@ -1,13 +1,13 @@
-// app/dashboard/page.js
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
-import DashboardPage from "@/app/_components/UI/DashboardPage"; // 👈 your existing UI component
+import DashboardPage from "@/app/_components/UI/DashboardPage";
 
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
-  const token = cookies().get("jwt")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("jwt")?.value;
 
   if (!token) {
     redirect("/login?error=unauthenticated");
@@ -15,7 +15,7 @@ export default async function Dashboard() {
 
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
+    await jwtVerify(token, secret);
 
     return <DashboardPage />;
   } catch (err) {

@@ -1,4 +1,5 @@
 const Deck = require("./../models/Deck");
+const Flashcard = require("./../models/Flashcard");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -70,6 +71,9 @@ exports.deleteDeck = catchAsync(async (req, res, next) => {
   if (!deck) {
     return next(new AppError("No deck found with this ID", 404));
   }
+
+  await Flashcard.deleteMany({ deckId: deck._id });
+  await deck.deleteOne();
 
   res.status(200).json({
     status: "success",
