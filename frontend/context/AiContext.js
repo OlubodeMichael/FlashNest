@@ -2,6 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import { fetchClient } from "@/utils/fetchClient";
 
 const AiContext = createContext();
 
@@ -10,9 +11,11 @@ export const AiProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const apiUrl = "http://localhost:8000/api"; //process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
   const previewFlashcards = async ({ topic, text, file, count }) => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("jwt") : null;
     try {
       setIsLoading(true);
       setError(null);
@@ -26,8 +29,11 @@ export const AiProvider = ({ children }) => {
 
       const res = await fetch(`${apiUrl}/ai/preview-flashcards`, {
         method: "POST",
-        credentials: "include",
         body: formData,
+        credentials: "include",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
       });
 
       // Check for network or server errors
@@ -56,19 +62,10 @@ export const AiProvider = ({ children }) => {
 
   const saveFlashcards = async (aiFlashcards, deckId) => {
     try {
-      const response = await fetch(
-        `${apiUrl}/decks/${deckId}/flashcards/bulk`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ flashcards: aiFlashcards }),
-        }
-      );
-
-      const data = await response.json();
+      const data = await fetchClient(`/decks/${deckId}/flashcards/bulk`, {
+        method: "POST",
+        body: JSON.stringify({ flashcards: aiFlashcards }),
+      });
 
       if (data.status === "success") {
         console.log("✅ Flashcards saved:", data.data.flashcards);

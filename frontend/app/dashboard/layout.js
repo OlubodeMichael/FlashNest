@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import { useStudy } from "@/context/StudyContext";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
+import { isTokenExpired } from "@/utils/auth";
 
 export default function DashboardLayout({ children }) {
   const { user, logout, isLoading, fetchUser } = useAuth();
@@ -13,6 +14,17 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem("jwt");
+      setUser(null);
+      router.push("/login");
+    } else {
+      fetchUser();
+    }
+  }, []);
 
   useEffect(() => {
     const fetchUserOnLoad = async () => {

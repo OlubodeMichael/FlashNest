@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { fetchClient } from "@/utils/fetchClient";
 
 const StudyContext = createContext();
 
@@ -12,7 +13,7 @@ function StudyProvider({ children }) {
   const [error, setError] = useState(null);
   const [aiResponse, setAiResponse] = useState(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const apiUrl = "http://localhost:8000/api"; //process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
   const testAi = async () => {
     try {
@@ -53,19 +54,10 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/decks`, {
+      const data = await fetchClient(`/decks`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch decks");
-      }
-
-      const data = await res.json();
       setDecks(data.data.decks);
     } catch (err) {
       setError(err.message);
@@ -79,20 +71,11 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/decks/${deckId}`, {
+      const data = await fetchClient(`/decks/${deckId}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch deck");
-      }
-
-      const data = await res.json();
-      setDeck(data.data.deck);
+      setDeck(data?.data?.deck);
       return data;
     } catch (err) {
       setError(err.message);
@@ -106,26 +89,16 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/decks`, {
+      const res = await fetchClient(`/decks`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
         body: JSON.stringify(deckData),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to create deck");
-      }
-
-      const data = await res.json();
       await fetchDecks();
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
-      setError(null);
     }
   };
 
@@ -133,27 +106,17 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/decks/${deckId}`, {
+      const data = await fetchClient(`/decks/${deckId}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
         body: JSON.stringify(deckData),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to update deck");
-      }
-
-      const data = await res.json();
       await fetchDecks();
       return data;
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
-      setError(null);
     }
   };
 
@@ -161,23 +124,15 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/decks/${deckId}`, {
+      const res = await fetchClient(`/decks/${deckId}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete deck");
-      }
       await fetchDecks();
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
-      setError(null);
     }
   };
 
@@ -187,20 +142,11 @@ function StudyProvider({ children }) {
       setIsLoading(true);
       setError(null);
 
-      const res = await fetch(`${apiUrl}/decks/${deckId}/flashcards`, {
+      const data = await fetchClient(`/decks/${deckId}/flashcards`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch flashcards");
-      }
-
-      const data = await res.json();
-      setFlashcards(data.data.flashcards); // ✅ just the array
+      setFlashcards(data?.data?.flashcards); // ✅ just the array
     } catch (err) {
       setError(err.message);
     } finally {
@@ -212,16 +158,10 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/decks/${deckId}/flashcards`, {
+      const res = await fetchClient(`/decks/${deckId}/flashcards`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
         body: JSON.stringify(flashcardData),
       });
-
-      if (!res.ok) throw new Error("Failed to create flashcard");
 
       await fetchFlashcards(deckId);
     } catch (err) {
@@ -235,19 +175,13 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(
-        `${apiUrl}/decks/${deckId}/flashcards/${flashcardId}`,
+      const res = await fetchClient(
+        `/decks/${deckId}/flashcards/${flashcardId}`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
           body: JSON.stringify(flashcardData),
         }
       );
-
-      if (!res.ok) throw new Error("Failed to update flashcard");
 
       await fetchFlashcards(deckId);
     } catch (err) {
@@ -261,18 +195,12 @@ function StudyProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch(
-        `${apiUrl}/decks/${deckId}/flashcards/${flashcardId}`,
+      const res = await fetchClient(
+        `/decks/${deckId}/flashcards/${flashcardId}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
         }
       );
-
-      if (!res.ok) throw new Error("Failed to delete flashcard");
 
       await fetchFlashcards(deckId);
     } catch (err) {

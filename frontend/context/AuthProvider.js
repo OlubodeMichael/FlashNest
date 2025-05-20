@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { fetchClient } from "@/utils/fetchClient";
 
 const AuthContext = createContext();
 
@@ -9,21 +10,15 @@ function AuthProvider({ children }) {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const apiUrl = "http://localhost:8000/api"; //process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
   const fetchUser = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/me`, {
-        credentials: "include",
-      });
-      if (!res.ok) {
-        setUser(null);
-        return;
-      }
-      const data = await res.json();
-      setUser(data.data.user);
+      const res = await fetchClient(`/users/me`);
+
+      setUser(res.data.user);
     } catch (err) {
       console.error("Error fetching user:", err);
       setUser(null);
@@ -42,10 +37,8 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/signup`, {
+      const res = await fetchClient(`/users/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           firstName,
           lastName,
@@ -54,10 +47,8 @@ function AuthProvider({ children }) {
           passwordConfirm,
         }),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Signup failed");
-      }
+
+      localStorage.setItem("jwt", res.token);
       await fetchUser();
     } catch (err) {
       setError(err.message);
@@ -70,16 +61,12 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/login`, {
+      const res = await fetchClient(`/users/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Login failed");
-      }
+      localStorage.setItem("jwt", res.token);
+
       await fetchUser();
     } catch (err) {
       console.error("Login error:", err);
@@ -93,14 +80,11 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/logout`, {
+      const res = await fetchClient(`/users/logout`, {
         method: "POST",
-        credentials: "include",
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Logout failed");
-      }
+
+      localStorage.removeItem("jwt");
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);
@@ -114,16 +98,11 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/forgotPassword`, {
+      const res = await fetchClient(`/users/forgotPassword`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Forgot password failed");
-      }
+
       // ✅ No fetchUser() here
     } catch (err) {
       setError(err.message);
@@ -136,16 +115,11 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/resetPassword/${token}`, {
+      const res = await fetchClient(`/users/resetPassword/${token}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ password, passwordConfirm }),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Reset password failed");
-      }
+
       await fetchUser(); // ✅ Fetch new user status after reset
     } catch (err) {
       setError(err.message);
@@ -159,16 +133,11 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/updateMe`, {
+      const res = await fetchClient(`/users/updateMe`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(data),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Update failed");
-      }
+
       await fetchUser();
     } catch (err) {
       setError(err.message);
@@ -181,14 +150,10 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/deleteMe`, {
+      const res = await fetchClient(`/users/deleteMe`, {
         method: "DELETE",
-        credentials: "include",
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Delete failed");
-      }
+
       setUser(null); // ✅ Explicitly set user state to null after deletion
     } catch (err) {
       setError(err.message);
@@ -201,21 +166,19 @@ function AuthProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${apiUrl}/users/updateMyPassword`, {
+
+      await fetchClient("/users/updateMyPassword", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           passwordCurrent,
           password,
           passwordConfirm,
         }),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Update password failed");
-      }
-      await fetchUser(); // ✅ Fetch updated user after password update
+
+      localStorage.removeItem("jwt");
+      setUser(null);
+      router.push("/login");
     } catch (err) {
       setError(err.message);
     } finally {
