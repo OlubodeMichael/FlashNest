@@ -9,29 +9,34 @@ import LoadingSpinner from "@/app/_components/LoadingSpinner";
 import { isTokenExpired } from "@/utils/auth";
 
 export default function DashboardLayout({ children }) {
-  const { user, logout, isLoading, fetchUser } = useAuth();
+  const { user, logout, isLoading, fetchUser, setUser } = useAuth();
   const { fetchDecks } = useStudy();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (!token || isTokenExpired(token)) {
-      localStorage.removeItem("jwt");
-      setUser(null);
-      router.push("/login");
-    } else {
-      fetchUser();
-    }
-  }, []);
+    const initializeApp = async () => {
+      const token = localStorage.getItem("jwt");
+      if (!token || isTokenExpired(token)) {
+        localStorage.removeItem("jwt");
+        setUser(null);
+        router.push("/login");
+        return;
+      }
 
-  useEffect(() => {
-    const fetchUserOnLoad = async () => {
-      await fetchUser();
-      await fetchDecks();
+      try {
+        await fetchUser();
+        await fetchDecks();
+      } catch (error) {
+        console.error("Failed to initialize app:", error);
+        localStorage.removeItem("jwt");
+        setUser(null);
+        router.push("/login");
+      }
     };
-    fetchUserOnLoad();
+
+    initializeApp();
   }, []);
 
   const handleLogout = async () => {

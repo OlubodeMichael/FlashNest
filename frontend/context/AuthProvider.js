@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { fetchClient } from "@/utils/fetchClient";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -199,6 +201,7 @@ function AuthProvider({ children }) {
         user,
         error,
         isLoading,
+        setUser,
         signup,
         login,
         logout,
