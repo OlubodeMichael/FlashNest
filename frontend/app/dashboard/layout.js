@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import { useStudy } from "@/context/StudyContext";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
+import { isTokenExpired } from "@/utils/auth";
 
 export default function DashboardLayout({ children }) {
   const { user, logout, isLoading, fetchUser } = useAuth();
@@ -15,20 +16,23 @@ export default function DashboardLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem("jwt");
+      setUser(null);
+      router.push("/login");
+    } else {
+      fetchUser();
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchUserOnLoad = async () => {
       await fetchUser();
       await fetchDecks();
     };
     fetchUserOnLoad();
   }, []);
-
-  // Get user initials for profile display
-  const getUserInitials = () => {
-    if (user && user.firstName && user.lastName) {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
-    }
-    return "MO"; // Default to Michael Olubode initials
-  };
 
   const handleLogout = async () => {
     try {
