@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import { useStudy } from "@/context/StudyContext";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
-import { jwtDecode } from "jwt-decode";
+//import { jwtDecode } from "jwt-decode";
 
 export default function DashboardLayout({ children }) {
   const { user, logout, isLoading, fetchUser, setUser } = useAuth();

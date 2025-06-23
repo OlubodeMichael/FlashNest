@@ -52,7 +52,7 @@ export default function Privacy() {
               🔒 Privacy Policy — FlashNest
             </h1>
             <p className="text-lg text-gray-600">
-              Effective Date: December 2024
+              Effective Date: June 2025
             </p>
           </div>
         </div>
@@ -298,7 +298,7 @@ export default function Privacy() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">
-                      <strong>Last updated:</strong> December 2024
+                      <strong>Last updated:</strong> June 2025
                     </p>
                     <p className="text-sm text-gray-600 mt-1">
                       <strong>Contact:</strong>{" "}
@@ -329,7 +329,7 @@ export default function Privacy() {
         <div className="max-w-5xl mx-auto">
           <div className="pt-6 border-t border-gray-200 flex flex-col md:flex-row md:justify-between items-center">
             <p className="text-gray-500 text-xs mb-4 md:mb-0">
-              © 2024 FlashNest. All rights reserved.
+              © 2025 FlashNest. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a
