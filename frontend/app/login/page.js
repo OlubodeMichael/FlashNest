@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 
 export default function Login() {
   const router = useRouter();
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, tokenChecked, user } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -30,6 +30,11 @@ export default function Login() {
       [name]: name === "rememberMe" ? checked : value,
     });
   };
+
+  useEffect(() => {
+    if (!tokenChecked || !user) return;
+    // ... fetchProfile logic
+  }, [tokenChecked, user]);
 
   return (
     <div className="h-screen flex flex-col md:flex-row">

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import { useStudy } from "@/context/StudyContext";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
-import { isTokenExpired } from "@/utils/auth";
+import { jwtDecode } from "jwt-decode";
 
 export default function DashboardLayout({ children }) {
   const { user, logout, isLoading, fetchUser, setUser } = useAuth();
@@ -16,23 +16,37 @@ export default function DashboardLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    const logoutAndRedirect = () => {
+      localStorage.removeItem("jwt");
+      setUser(null); // assumed from context
+      router.push("/login");
+    };
+
+    const isTokenExpired = (token) => {
+      try {
+        const { exp } = jwtDecode(token);
+        return Date.now() >= exp * 1000;
+      } catch {
+        return true;
+      }
+    };
+
     const initializeApp = async () => {
+      if (typeof window === "undefined") return;
+
       const token = localStorage.getItem("jwt");
+
       if (!token || isTokenExpired(token)) {
-        localStorage.removeItem("jwt");
-        setUser(null);
-        router.push("/login");
+        logoutAndRedirect();
         return;
       }
 
       try {
-        await fetchUser();
-        await fetchDecks();
+        await fetchUser(); // should setUser internally
+        await fetchDecks(); // optional depending on layout
       } catch (error) {
         console.error("Failed to initialize app:", error);
-        localStorage.removeItem("jwt");
-        setUser(null);
-        router.push("/login");
+        logoutAndRedirect();
       }
     };
 

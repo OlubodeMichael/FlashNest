@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/context/AuthProvider";
+import { AuthProvider } from "@/context/AuthProvider";
 import StudyProvider from "@/context/StudyContext";
 import { AiProvider } from "@/context/AiContext";
 import { Toaster } from "react-hot-toast";

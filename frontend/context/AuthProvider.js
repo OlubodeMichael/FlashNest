@@ -1,226 +1,211 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { fetchClient } from "@/utils/fetchClient";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import {
+  signIn as supaSignIn,
+  signUp as supaSignUp,
+  signOut as supaSignOut,
+  getCurrentUser,
+} from "flashnest-backend/authHelper";
+import { initSupabase, getSupabase } from "flashnest-backend/supabaseClient";
 
 const AuthContext = createContext();
 
-function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [isLoading, setLoading] = useState(false);
+  const [user, setUser] = useState(null); // Supabase Auth User
+  const [userProfile, setUserProfile] = useState(null); // DB Profile
+  const [isLoading, setIsLoading] = useState(false);
+  const [tokenChecked, setTokenChecked] = useState(false);
   const [error, setError] = useState(null);
+  const isInitialized = useRef(false);
 
-  const apiUrl = "http://localhost:8000/api"; //process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  // 👇 Initialize Supabase once
+  useEffect(() => {
+    if (!isInitialized.current) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const fetchUser = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchClient(`/users/me`);
+      if (!supabaseUrl || !supabaseKey) {
+        console.error("Missing Supabase env vars");
+        setError("Auth service not configured. Check environment variables.");
+        return;
+      }
 
-      setUser(res.data.user);
-    } catch (err) {
-      console.error("Error fetching user:", err);
-      setUser(null);
-    } finally {
-      setLoading(false);
+      initSupabase({
+        url: supabaseUrl,
+        key: supabaseKey,
+        options: {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: false,
+          },
+        },
+      });
+
+      isInitialized.current = true;
     }
-  };
+  }, []);
 
-  const signup = async ({
+  // 👇 Check for existing session
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.warn("Session check failed:", error.message);
+        setUser(null);
+      } else if (data?.session?.user) {
+        console.log("Session found:", data.session.user);
+        setUser(data.session.user);
+      } else {
+        console.log("No session found");
+        setUser(null);
+      }
+
+      setTokenChecked(true);
+    };
+
+    if (isInitialized.current) checkSession();
+  }, []);
+
+  // 👇 Fetch profile + subscribe to auth changes
+  useEffect(() => {
+    if (!tokenChecked) return;
+
+    const fetchProfile = async () => {
+      try {
+        const profile = await getCurrentUser();
+        console.log("Profile fetched:", profile);
+        setUserProfile(profile);
+      } catch (err) {
+        console.warn("Failed to fetch profile:", err.message);
+        setUserProfile(null);
+      }
+    };
+
+    if (user) {
+      console.log("User exists, fetching profile");
+      fetchProfile();
+    }
+
+    const supabase = getSupabase();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user);
+
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        setUserProfile(null);
+        router.replace("/login");
+      } else if (event === "SIGNED_IN" && session) {
+        setUser(session.user);
+        try {
+          const profile = await getCurrentUser();
+          console.log("Profile fetched after sign in:", profile);
+          setUserProfile(profile);
+          console.log("Redirecting to dashboard...");
+          router.replace("/dashboard");
+        } catch (err) {
+          console.warn("Profile fetch error:", err.message);
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [tokenChecked, user, router]);
+
+  // 👇 Signup method
+  const signUp = async (
     firstName,
     lastName,
     email,
     password,
-    passwordConfirm,
-  }) => {
+    confirmPassword
+  ) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
-      const res = await fetchClient(`/users/signup`, {
-        method: "POST",
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-          passwordConfirm,
-        }),
+
+      const { session, profile } = await supaSignUp({
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
       });
 
-      localStorage.setItem("jwt", res.token);
-      await fetchUser();
+      if (!session) throw new Error("No session returned");
+      setUser(session.user);
+      setUserProfile(profile);
+      router.replace("/dashboard");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Signup failed");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  // 👇 Login method
   const login = async (email, password) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
-      const res = await fetchClient(`/users/login`, {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-      localStorage.setItem("jwt", res.token);
+      console.log("Attempting login...");
 
-      await fetchUser();
+      const { session, profile } = await supaSignIn({ email, password });
+      console.log("Login response:", { session, profile });
+
+      if (!session) throw new Error("No session returned");
+
+      setUser(session.user);
+      setUserProfile(profile);
+      console.log("Redirecting to dashboard...");
+      router.replace("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.message);
+      setError(err.message || "Login failed");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  // 👇 Logout method
   const logout = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchClient(`/users/logout`, {
-        method: "POST",
-      });
-
-      localStorage.removeItem("jwt");
+      console.log("Attempting logout...");
+      await supaSignOut();
+      console.log("Logout successful");
+    } catch (err) {
+      console.error("Signout failed:", err.message);
+    } finally {
       setUser(null);
-    } catch (err) {
-      console.error("Logout error:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      setUserProfile(null);
+      router.replace("/login");
     }
   };
-
-  const forgotPassword = async (email) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchClient(`/users/forgotPassword`, {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
-
-      // ✅ No fetchUser() here
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetPassword = async (token, password, passwordConfirm) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchClient(`/users/resetPassword/${token}`, {
-        method: "PATCH",
-        body: JSON.stringify({ password, passwordConfirm }),
-      });
-
-      await fetchUser(); // ✅ Fetch new user status after reset
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-      // ✅ Removed erroneous setError(null);
-    }
-  };
-
-  const updateMe = async (data) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchClient(`/users/updateMe`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
-
-      await fetchUser();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteMe = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchClient(`/users/deleteMe`, {
-        method: "DELETE",
-      });
-
-      setUser(null); // ✅ Explicitly set user state to null after deletion
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updatePassword = async (passwordCurrent, password, passwordConfirm) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      await fetchClient("/users/updateMyPassword", {
-        method: "PATCH",
-        body: JSON.stringify({
-          passwordCurrent,
-          password,
-          passwordConfirm,
-        }),
-      });
-
-      localStorage.removeItem("jwt");
-      setUser(null);
-      router.push("/login");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /*
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  */
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        error,
-        isLoading,
-        setUser,
-        signup,
+        userProfile,
+        signUp,
         login,
         logout,
-        fetchUser,
-        forgotPassword,
-        resetPassword,
-        updateMe,
-        deleteMe,
-        updatePassword,
+        isLoading,
+        error,
+        tokenChecked,
       }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
 };
 
-export default AuthProvider;
+export const useAuth = () => useContext(AuthContext);
