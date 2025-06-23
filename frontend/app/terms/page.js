@@ -51,9 +51,7 @@ export default function Terms() {
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
               📄 Terms and Conditions — FlashNest
             </h1>
-            <p className="text-lg text-gray-600">
-              Effective Date: December 2024
-            </p>
+            <p className="text-lg text-gray-600">Effective Date: June 2025</p>
           </div>
         </div>
       </header>
@@ -247,7 +245,7 @@ export default function Terms() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">
-                      <strong>Last updated:</strong> December 2024
+                      <strong>Last updated:</strong> June 2025
                     </p>
                     <p className="text-sm text-gray-600 mt-1">
                       <strong>Contact:</strong>{" "}
