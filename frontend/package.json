@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "flashnest-backend": "github:OlubodeMichael/flashnest-backend",
     "framer-motion": "^12.6.3",
     "jose": "^6.0.10",
     "next": "15.3.0",
