@@ -65,6 +65,7 @@ export default function Home() {
           </motion.div>
 
           {/* Desktop Navigation */}
+          {/*
           <div className="hidden md:flex items-center">
             <div className="flex space-x-10 font-medium mr-8">
               {["Features", "Why FlashNest", "Pricing"].map((item, i) => (
@@ -105,6 +106,7 @@ export default function Home() {
           </div>
 
           {/* Mobile Menu Button */}
+
           <motion.button
             className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100"
             initial={{ opacity: 0 }}
